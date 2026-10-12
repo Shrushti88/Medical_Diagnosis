@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
 import numpy as np
@@ -8,11 +9,30 @@ import pandas as pd
 import shap
 import uvicorn
 import os
+from pathlib import Path
 
 app = FastAPI(title="XAI Medical Diagnosis System")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Resolve paths safely for local and serverless environments
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "model.pkl"
+if not MODEL_PATH.exists():
+    MODEL_PATH = BASE_DIR.parent / "model.pkl"
+
+STATIC_DIR = BASE_DIR / "static"
+if not STATIC_DIR.exists():
+    STATIC_DIR = BASE_DIR.parent / "static"
+
 # Load model artifacts
-with open("model.pkl", "rb") as f:
+with open(MODEL_PATH, "rb") as f:
     artifacts = pickle.load(f)
     
 model = artifacts["model"]
@@ -91,15 +111,19 @@ def predict(data: PatientData):
         "explanation": explanation
     }
 
-# Create static dir if it doesn't exist
-os.makedirs("static", exist_ok=True)
-
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Mount static files safely if directory exists
+if STATIC_DIR.is_dir():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 @app.get("/")
 def read_index():
-    return FileResponse("static/index.html")
+    index_file = STATIC_DIR / "index.html"
+    if index_file.is_file():
+        return FileResponse(str(index_file))
+    root_index = BASE_DIR / "index.html"
+    if root_index.is_file():
+        return FileResponse(str(root_index))
+    return {"message": "XAI Medical Diagnosis System API is running"}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8555, reload=True)
