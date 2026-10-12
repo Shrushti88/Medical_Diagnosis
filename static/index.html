@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAI Medical Diagnosis System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>Medical Diagnosis</h1>
+            <p class="subtitle">AI-powered risk assessment with transparent explanations.</p>
+            <div class="disclaimer">
+                <strong>Disclaimer:</strong> For educational purposes only; not a medical diagnosis. Consult a
+                healthcare professional for medical advice.
+            </div>
+        </header>
+
+        <div class="app-grid">
+            <section class="card input-section">
+                <h2>Patient Data</h2>
+                <form id="prediction-form">
+                    <div class="form-group">
+                        <label for="age">Age (years)</label>
+                        <input type="number" id="age" name="Age" min="0" max="120" value="45" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bmi">BMI (kg/m²)</label>
+                        <input type="number" id="bmi" name="BMI" min="10" max="60" step="0.1" value="26.5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="glucose">Glucose (mg/dL)</label>
+                        <input type="number" id="glucose" name="Glucose" min="0" max="500" value="105" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blood_pressure">Blood Pressure (Systolic)</label>
+                        <input type="number" id="blood_pressure" name="Blood_Pressure" min="0" max="300" value="125"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cholesterol">Cholesterol (mg/dL)</label>
+                        <input type="number" id="cholesterol" name="Cholesterol" min="0" max="600" value="210" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="heart_rate">Heart Rate (bpm)</label>
+                        <input type="number" id="heart_rate" name="Heart_Rate" min="0" max="250" value="72" required>
+                    </div>
+
+                    <button type="submit" id="predict-btn">Analyze Patient</button>
+                </form>
+            </section>
+
+            <section class="results-section hidden" id="results-container">
+                <div class="card result-card">
+                    <h2>Diagnosis Output</h2>
+                    <div class="prediction-box" id="prediction-box">
+                        <h3 id="predicted-disease">Healthy</h3>
+                        <div class="badges">
+                            <span class="badge" id="confidence-badge">Confidence: 95%</span>
+                            <span class="badge" id="risk-badge">Risk: Low</span>
+                        </div>
+                    </div>
+                    <div class="explanation-box">
+                        <h4>Why did the model make this prediction?</h4>
+                        <p id="explanation-text">Loading explanation...</p>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>Feature Contributions (SHAP)</h2>
+                    <p class="chart-subtitle">How each factor influenced the prediction.</p>
+                    <div class="chart-container">
+                        <canvas id="shapChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
